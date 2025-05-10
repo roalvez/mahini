@@ -1,0 +1,26 @@
+FROM ruby:3.4.3
+
+# Install dependencies
+RUN apt-get update -qq && apt-get install -y \
+  build-essential \
+  libpq-dev \
+  nodejs \
+  yarn \
+  git \
+  curl
+
+# Set working directory
+WORKDIR /app
+
+# Install bundler
+RUN gem install bundler
+
+# Copy Gemfile & install gems early for caching
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+# Copy app code
+COPY . .
+
+# Start command (override in docker-compose)
+CMD ["bash"]
