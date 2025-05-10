@@ -13,5 +13,17 @@ FactoryBot.define do
         content_type: 'image/png'
       )
     end
+
+    trait :with_multiple_images do
+      after(:create) do |product|
+        3.times do |i|
+          product.images.attach(
+            io: File.open(Rails.root.join('spec', 'support', 'assets', "sample_image_#{i + 1}.png")),
+            filename: "sample_image_#{i + 1}.png",
+            content_type: 'image/png'
+          )
+        end
+      end
+    end
   end
 end

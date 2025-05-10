@@ -22,8 +22,21 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow fixed w-full top-0 left-0 z-10">
+      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <a href="/" class="text-2xl font-bold tracking-tight text-pink-600">Mahini</a>
+        <div>
+          <a href="/" class="text-gray-700 hover:text-pink-600 px-3">Home</a>
+          <a href="/products" class="text-gray-700 hover:text-pink-600 px-3">Catálogo</a>
+          <a href="/about" class="text-gray-700 hover:text-pink-600 px-3">Sobre nós</a>
+          <a href="/contact" class="text-gray-700 hover:text-pink-600 px-3">Contato</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container mx-auto mt-28 px-5">
       <%= yield %>
     </main>
   </body>

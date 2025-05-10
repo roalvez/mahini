@@ -3,7 +3,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-dev
-    command: bash -c "bundle install && rails server -b 0.0.0.0"
+    command: bash -c "bundle install && bin/dev"
+    tty: true
+    stdin_open: true
+    environment:
+      - TAILWINDCSS_WATCH_POLL=true   # 👈 This line is key!
     volumes:
       - .:/app
     ports:
