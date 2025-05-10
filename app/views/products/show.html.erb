@@ -1,0 +1,31 @@
+<div class="container mx-auto p-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-4xl font-bold"><%= @product.name %></h1>
+      <p class="text-xl text-gray-600"><%= @product.price %></p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Product Image Gallery -->
+      <div class="flex flex-col gap-4">
+        <div>
+          <% if @product.images.attached? %>
+            <%= image_tag @product.images.first, alt: @product.name, class: "w-full h-80 object-cover rounded-lg" %>
+          <% else %>
+            <img src="https://via.placeholder.com/300" alt="No image available" class="w-full h-80 object-cover rounded-lg">
+          <% end %>
+        </div>
+        <div class="flex gap-4">
+          <% @product.images.each do |image| %>
+            <%= image_tag image, alt: @product.name, class: "w-20 h-20 object-cover rounded-lg cursor-pointer" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Product Description -->
+      <div class="p-4 bg-white shadow-lg rounded-lg">
+        <h2 class="text-2xl font-semibold mb-4">Description</h2>
+        <p class="text-gray-700"><%= @product.description %></p>
+      </div>
+    </div>
+  </div>
+</div>

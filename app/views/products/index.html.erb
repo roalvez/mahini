@@ -1,0 +1,20 @@
+<div class="container mx-auto p-4">
+  <h1 class="text-4xl font-bold text-center mb-8">Product Catalogue</h1>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <% @products.each do |product| %>
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105">
+        <%= link_to product_path(product) do %>
+          <% if product.images.attached? %>
+            <%= image_tag product.images.first, alt: product.name, class: "w-full h-48 object-cover" %>
+          <% else %>
+            <img src="https://via.placeholder.com/300" alt="No image available" class="w-full h-48 object-cover">
+          <% end %>
+          <div class="p-4">
+            <h2 class="text-xl font-semibold"><%= product.name %></h2>
+            <p class="text-gray-600"><%= product.price %></p>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
