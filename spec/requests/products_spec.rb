@@ -2,17 +2,20 @@ require 'rails_helper'
 
 RSpec.describe "Products", type: :request do
   describe "GET /index" do
-    it "returns http success" do
+    subject(:index) do
       get "/products/index"
-      expect(response).to have_http_status(:success)
+      response
     end
+
+    it { is_expected.to be_successful }
   end
 
   describe "GET /show" do
-    it "returns http success" do
+    subject(:show) do
       get "/products/show"
-      expect(response).to have_http_status(:success)
+      response
     end
-  end
 
+    it { is_expected.to be_successful }
+  end
 end
