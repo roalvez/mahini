@@ -1,12 +1,17 @@
 FROM ruby:3.4.3
 
-RUN apt-get update -qq && apt-get install -y \
-  build-essential \
-  libpq-dev \
-  nodejs \
-  yarn \
-  git \
-  curl
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    libpq-dev \
+    nodejs \
+    yarn \
+    git \
+    curl \
+    libjemalloc2 \
+    libvips \
+    postgresql-client && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 WORKDIR /app
 
