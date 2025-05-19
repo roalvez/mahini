@@ -9,7 +9,7 @@ RSpec.describe "admin/products/index", type: :view do
   let(:product) { create(:product) }
 
   before do
-    assign(:products, Kaminari.paginate_array([product]).page(1))
+    assign(:products, Kaminari.paginate_array([ product ]).page(1))
     allow(view).to receive(:url_for).and_return("/rails/active_storage/blobs/variant/test.png")
   end
 

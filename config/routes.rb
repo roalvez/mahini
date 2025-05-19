@@ -16,7 +16,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :products do
-      resources :product_variants, only: [:edit, :update, :destroy]
+      resources :product_variants, only: [ :edit, :update, :destroy ]
     end
     resources :categories
     resources :subcategories

@@ -2,15 +2,13 @@
   <div class="flex flex-wrap -mx-4">
     <% @products.each do |product| %>
       <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-4 mb-8 flex">
-        <%=
-          link_to(
-            product_path(product),
-            class: "bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-allduration-300 overflow-hidden flex
-                    flex-col w-full"
-          ) do
-        %>
-          <% if product.images.attached? %>
-            <%= image_tag product.images.first, alt: product.name, class: "w-full h-56 object-cover" %>
+        <%= link_to(
+          product_path(product),
+          class: "bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-allduration-300 overflow-hidden flex flex-col w-full"
+        ) do %>
+          <% first_variant = product.product_variants.includes(images_attachments: :blob).find { |v| v.images.attached? } %>
+          <% if first_variant %>
+            <%= image_tag first_variant.images.first, alt: product.name, class: "w-full h-56 object-cover" %>
           <% else %>
             <img src="https://via.placeholder.com/300x224?text=No+Image" alt="No image available" class="w-full h-56 object-cover">
           <% end %>

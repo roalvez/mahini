@@ -1,51 +1,91 @@
-<div
-  class="grid grid-cols-1 md:grid-cols-2 gap-6"
-  data-controller="gallery"
-  data-gallery-images-value="<%= json_escape(@product.images.map { |img| url_for(img) }.to_json) %>"
->
-  <div class="flex flex-col gap-4">
-    <!-- Carousel with navigation -->
-    <div class="relative">
-      <button
-        type="button"
-        class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 p-2 rounded-full shadow hover:bg-opacity-100 z-10"
-        data-action="gallery#previous"
-      >
-        ◀
-      </button>
-
-      <%= image_tag(
-        @product.images.first || "https://via.placeholder.com/300",
-        alt: @product.name,
-        class: "w-full rounded-lg max-w-96 max-h-96",
-        data: { gallery_target: "mainImage" }
-      ) %>
-
-      <button
-        type="button"
-        class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 p-2 rounded-full shadow hover:bg-opacity-100 z-10"
-        data-action="gallery#next"
-      >
-        ▶
-      </button>
-    </div>
-
-    <!-- Thumbnails -->
-    <div class="flex gap-4">
-      <% @product.images.each do |image| %>
-        <%= image_tag(
-          image,
-          alt: @product.name,
-          class: "w-20 h-20 object-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-pink-500",
-          data: { action: "click->gallery#show", image_url: url_for(image) }
-        ) %>
-      <% end %>
-    </div>
+<div class="container mx-auto max-w-4xl p-6">
+  <div class="flex gap-2 mb-4">
+    <% if @category %>
+      <span class="inline-block bg-pink-100 text-pink-700 text-xs font-semibold px-3 py-1 rounded-full mr-2">
+        <%= @category.name %>
+      </span>
+    <% end %>
+    <% if @subcategory %>
+      <span class="inline-block bg-pink-200 text-pink-800 text-xs font-semibold px-3 py-1 rounded-full">
+        <%= @subcategory.name %>
+      </span>
+    <% end %>
   </div>
-
-  <!-- Description -->
-  <div class="p-4 bg-white shadow-lg rounded-lg">
-    <h2 class="text-2xl font-semibold mb-4">Description</h2>
-    <p class="text-gray-700"><%= @product.description %></p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-controller="gallery" data-variants='<%= raw(@variants.map { |v| {
+    color_id: v.color_id,
+    size_id: v.size_id,
+    available: v.available,
+    images: v.images.map { |img| url_for(img) }
+  } }.to_json) %>'>
+    <div class="flex flex-col gap-4">
+      <!-- Carousel with navigation -->
+      <div class="relative">
+        <button type="button" class="flex absolute cursor-pointer left-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 p-2 rounded-full shadow hover:bg-pink-100 hover:text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 z-10 transition-colors" data-action="gallery#previous">
+          <%= material_icon.shape(:chevron_left) %>
+        </button>
+        <%= image_tag(
+          @first_variant_with_images&.images&.first || "https://via.placeholder.com/300",
+          alt: @product.name,
+          class: "w-full rounded-lg max-w-96 max-h-96 cursor-zoom-in transition-transform",
+          data: { gallery_target: "mainImage", action: "click->gallery#expand" }
+        ) %>
+        <button type="button" class="flex absolute cursor-pointer right-0 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 p-2 rounded-full shadow hover:bg-pink-100 hover:text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 z-10 transition-colors" data-action="gallery#next">
+          <%= material_icon.shape(:chevron_right) %>
+        </button>
+      </div>
+      <div data-gallery-target="modal" class="fixed inset-0 bg-gray-700/90 flex items-center justify-center z-50 hidden">
+        <div class="relative">
+          <button type="button" class="absolute top-2 right-2 text-gray-800 hover:text-black focus:outline-none focus:ring-2 focus:ring-pink-400 transition-colors z-10" data-action="gallery#closeModal">
+            <%= material_icon.shape(:close) %>
+          </button>
+          <img src="" alt="Imagem expandida" class="max-w-3xl max-h-[90vh] rounded shadow-lg" data-gallery-target="modalImage">
+        </div>
+      </div>
+      <!-- Thumbnails -->
+      <div class="flex gap-4" data-gallery-target="thumbnails">
+        <% (@first_variant_with_images&.images || []).each do |image| %>
+          <%= image_tag(
+            image,
+            alt: @product.name,
+            class: "w-20 h-20 object-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-pink-500",
+            data: { action: "click->gallery#show", image_url: url_for(image) }
+          ) %>
+        <% end %>
+      </div>
+    </div>
+    <!-- Description and attributes -->
+    <div class="p-4 bg-white shadow-lg rounded-lg">
+      <h1 class="text-2xl font-bold text-gray-800 mb-2"><%= @product.name %></h1>
+      <p class="text-gray-700 mb-4"><%= @product.description %></p>
+      <div class="mb-2"><span class="text-pink-700 font-bold"><%= number_to_currency(@product.price, unit: "R$ ") %></span></div>
+      <div class="mb-5 flex items-center gap-2">
+        <% @colors.each do |color| %>
+          <% available = @variants.any? { |v| v.color_id == color.id && v.available } %>
+          <button type="button"
+                  class="cursor-pointer w-7 h-7 rounded-full border-2 border-white flex items-center justify-center focus:border-pink-500 shadow-sm transition hover:scale-110 <%= available ? 'border-pink-400' : 'border-gray-300 opacity-40 cursor-not-allowed' %>"
+                  style="background: <%= color.hex %>"
+                  data-gallery-target="colorButton"
+                  data-action="gallery#changeColor"
+                  data-color-id="<%= color.id %>"
+                  <%= 'disabled' unless available %>
+                  title="<%= color.name %>">
+            <span class="sr-only"><%= color.name %></span>
+          </button>
+        <% end %>
+      </div>
+      <div class="mb-2"><span class="font-semibold">Disponível:</span> <%= @product.available ? 'Sim' : 'Não' %></div>
+      <div class="mb-5 flex items-center gap-2">
+        <% @all_size_names.each do |size_name| %>
+          <% size_obj = @sizes_by_name[size_name] %>
+          <% size_id = size_obj&.id %>
+          <% available = size_obj && @variants.any? { |v| v.size_id == size_obj.id && v.color_id == @focused_color_id && v.available } %>
+          <% if size_obj %>
+            <span data-gallery-target="sizePill" data-size-id="<%= size_id %>" class="inline-block px-2 py-1 rounded text-xs font-semibold <%= available ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-400 line-through' %>"><%= size_name %></span>
+          <% else %>
+            <span data-gallery-target="sizePill" data-size-id="" class="inline-block px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-300 line-through opacity-70"><%= size_name %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>
