@@ -3,10 +3,10 @@ require 'rails_helper'
 describe Admin, type: :model do
   subject { build(:admin) }
 
-  it { should validate_presence_of(:email) }
-  it { should validate_uniqueness_of(:email) }
-  it { should validate_uniqueness_of(:session_token) }
-  it { should have_secure_password }
+  it { is_expected.to validate_presence_of(:email) }
+  it { is_expected.to validate_uniqueness_of(:email) }
+  it { is_expected.to validate_uniqueness_of(:session_token) }
+  it { is_expected.to have_secure_password }
 
   describe 'session token' do
     let(:admin) { build(:admin, session_token: nil) }

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_15_190840) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_18_123005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,14 +52,65 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_15_190840) do
     t.index ["session_token"], name: "index_admins_on_session_token", unique: true
   end
 
+  create_table "categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_categories_on_name", unique: true
+  end
+
+  create_table "colors", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "hex"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_colors_on_name", unique: true
+  end
+
+  create_table "product_variants", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.bigint "color_id", null: false
+    t.bigint "size_id", null: false
+    t.boolean "available", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["color_id"], name: "index_product_variants_on_color_id"
+    t.index ["product_id"], name: "index_product_variants_on_product_id"
+    t.index ["size_id"], name: "index_product_variants_on_size_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "name"
     t.text "description"
     t.integer "price_cents", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "available", default: true, null: false
+    t.bigint "subcategory_id"
+    t.index ["subcategory_id"], name: "index_products_on_subcategory_id"
+  end
+
+  create_table "sizes", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_sizes_on_name", unique: true
+  end
+
+  create_table "subcategories", force: :cascade do |t|
+    t.string "name", null: false
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id", "name"], name: "index_subcategories_on_category_id_and_name", unique: true
+    t.index ["category_id"], name: "index_subcategories_on_category_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "product_variants", "colors"
+  add_foreign_key "product_variants", "products"
+  add_foreign_key "product_variants", "sizes"
+  add_foreign_key "products", "subcategories"
+  add_foreign_key "subcategories", "categories"
 end

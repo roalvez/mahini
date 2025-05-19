@@ -1,7 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Product, type: :model do
-  it { should validate_presence_of(:name) }
-  it { should validate_presence_of(:price_cents) }
-  it { should have_many_attached(:images) }
+  subject(:product) { build(:product) }
+
+  it { is_expected.to belong_to(:subcategory) }
+  it { is_expected.to have_one(:category).through(:subcategory) }
+  it { is_expected.to have_many(:product_variants).dependent(:destroy) }
+  it { is_expected.to have_many(:colors).through(:product_variants) }
+  it { is_expected.to have_many(:sizes).through(:product_variants) }
+  it { is_expected.to validate_presence_of(:name) }
+  it { is_expected.to validate_presence_of(:price_cents) }
 end

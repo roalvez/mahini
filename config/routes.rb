@@ -15,7 +15,13 @@ Rails.application.routes.draw do
   delete "logout" => "sessions#destroy", as: :logout
 
   namespace :admin do
-    resources :products
+    resources :products do
+      resources :product_variants, only: [:edit, :update, :destroy]
+    end
+    resources :categories
+    resources :subcategories
+    resources :colors
+    resources :sizes
   end
 
   # Defines the root path route ("/")

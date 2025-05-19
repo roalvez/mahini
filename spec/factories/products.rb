@@ -2,28 +2,10 @@
 
 FactoryBot.define do
   factory :product do
-    name { "Sample Product" }
-    price { "29.99" }
-    description { "This is a sample product description." }
-
-    after(:create) do |product|
-      product.images.attach(
-        io: File.open(Rails.root.join('spec', 'support', 'assets', 'sample_image.png')),
-        filename: 'sample_image.png',
-        content_type: 'image/png'
-      )
-    end
-
-    trait :with_multiple_images do
-      after(:create) do |product|
-        3.times do |i|
-          product.images.attach(
-            io: File.open(Rails.root.join('spec', 'support', 'assets', "sample_image_#{i + 1}.png")),
-            filename: "sample_image_#{i + 1}.png",
-            content_type: 'image/png'
-          )
-        end
-      end
-    end
+    name { Faker::Commerce.product_name }
+    price { Faker::Commerce.price(range: 10..100.0, as_string: true) }
+    description { Faker::Lorem.paragraph(sentence_count: 2) }
+    available { true }
+    association :subcategory
   end
 end
