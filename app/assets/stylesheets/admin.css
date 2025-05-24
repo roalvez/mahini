@@ -1,0 +1,59 @@
+/* Admin Section Global Styles with CSS Nesting */
+
+.admin-layout {
+  background-color: #faf7fa; /* Very light pink background */
+  min-height: 100vh;
+
+  .admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .admin-header {
+    background: white;
+    border-bottom: 1px solid #fbcfe8; /* pink-200 */
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+
+    .admin-title {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #be185d; /* pink-700 */
+    }
+
+    .admin-breadcrumb {
+      color: #6b7280; /* gray-500 */
+      font-size: 0.875rem;
+    }
+  }
+}
+
+/* Admin button styles */
+.admin-btn {
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  &.primary {
+    background-color: #be185d; /* pink-600 */
+    color: white;
+
+    &:hover {
+      background-color: #a21650; /* pink-700 */
+    }
+  }
+
+  &.secondary {
+    background-color: #e5e7eb; /* gray-200 */
+    color: #374151; /* gray-700 */
+
+    &:hover {
+      background-color: #d1d5db; /* gray-300 */
+    }
+  }
+}

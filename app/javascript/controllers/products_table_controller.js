@@ -47,6 +47,69 @@ export default class extends Controller {
     });
   }
 
+  // Handle filter events from comboboxes
+  filter(event) {
+    const { name, value } = event.detail;
+
+    // Get current form data
+    const form = this.element.querySelector('form');
+    const formData = new FormData(form);
+
+    // Update the specific filter
+    if (value && value.trim() !== '') {
+      formData.set(name, value);
+    } else {
+      formData.delete(name);
+    }
+
+    // Apply all filters
+    const filters = Object.fromEntries(formData.entries());
+    this.applyFilters(filters);
+  }
+
+  // Handle form submission for text input filters
+  filterForm(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const filters = Object.fromEntries(formData.entries());
+    this.applyFilters(filters);
+  }
+
+  applyFilters(newFilters = {}) {
+    // Get current URL parameters
+    const url = new URL(window.location);
+
+    // Update with new filters
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value && value.trim() !== '') {
+        url.searchParams.set(key, value);
+      } else {
+        url.searchParams.delete(key);
+      }
+    });
+
+    // Reset to first page when filtering
+    url.searchParams.delete('page');
+
+    // Use Turbo to navigate
+    Turbo.visit(url.toString(), { frame: "products_table" });
+  }
+
+  clearFilters() {
+    const url = new URL(window.location);
+
+    // Remove filter parameters
+    ['name', 'category', 'subcategory', 'available'].forEach(param => {
+      url.searchParams.delete(param);
+    });
+
+    // Reset to first page
+    url.searchParams.delete('page');
+
+    // Use Turbo to navigate
+    Turbo.visit(url.toString(), { frame: "products_table" });
+  }
+
   connect() {
     this.beforeFetch = (e) => {
       if (e.target.id === "products_table") {
