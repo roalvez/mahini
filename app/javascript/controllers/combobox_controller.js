@@ -9,6 +9,7 @@ export default class extends Controller {
     allowClear: { type: Boolean, default: true },
     subcategories: Array // For subcategory filtering
   };  connect() {
+    console.log('Combobox controller connected with nameValue:', this.nameValue);
     this.filteredOptions = [...this.optionsValue];
     this.selectedValue = this.inputTarget.value;
     this.setupEventListeners();
@@ -21,6 +22,8 @@ export default class extends Controller {
 
     // Listen for category changes if this is a subcategory combobox
     if (this.nameValue === 'subcategory') {
+      console.log('Setting up category:changed event listener for subcategory combobox');
+      console.log('Subcategories value:', this.subcategoriesValue);
       document.addEventListener('category:changed', this.handleCategoryChange.bind(this));
     }
   }
@@ -74,12 +77,20 @@ export default class extends Controller {
   }
 
   handleCategoryChange(event) {
+    console.log('handleCategoryChange called with event:', event);
     const selectedCategory = event.detail.category;
+    console.log('Selected category from event:', selectedCategory);
     this.filterSubcategoriesByCategory(selectedCategory);
   }
 
   filterSubcategoriesByCategory(categoryName) {
-    if (!this.hasSubcategoriesValue) return;
+    console.log('filterSubcategoriesByCategory called with:', categoryName);
+    console.log('subcategoriesValue:', this.subcategoriesValue);
+
+    if (!this.hasSubcategoriesValue) {
+      console.log('No subcategoriesValue available');
+      return;
+    }
 
     if (!categoryName) {
       // Show all subcategories if no category selected
@@ -87,10 +98,15 @@ export default class extends Controller {
     } else {
       // Filter subcategories by selected category
       this.filteredOptions = this.subcategoriesValue
-        .filter(sc => sc.category === categoryName)
+        .filter(sc => {
+          console.log('Checking subcategory:', sc.name, 'with category:', sc.category?.name);
+          return sc.category && sc.category.name === categoryName;
+        })
         .map(sc => sc.name)
         .sort();
     }
+
+    console.log('Filtered options:', this.filteredOptions);
 
     // Clear current subcategory selection if it's not in the filtered options
     if (this.inputTarget.value && !this.filteredOptions.includes(this.inputTarget.value)) {
@@ -122,13 +138,19 @@ export default class extends Controller {
   }
 
   onInput() {
-    const query = this.inputTarget.value.toLowerCase();
+    const query = this.inputTarget.value.toLowerCase().trim();
 
     // Get base options and filter them by the query
     const baseOptions = this.getBaseOptions();
     this.filteredOptions = baseOptions.filter(option =>
       option.toLowerCase().includes(query)
     );
+
+    // If no matches found and user has typed something, add "Create new" option
+    if (this.filteredOptions.length === 0 && query.length > 0 &&
+        (this.nameValue === 'category' || this.nameValue === 'subcategory')) {
+      this.filteredOptions = [`Criar nova: "${this.inputTarget.value}"`];
+    }
 
     this.updateFilteredOptions();
 
@@ -147,7 +169,7 @@ export default class extends Controller {
       const currentCategory = this.getCurrentCategoryValue();
       if (currentCategory) {
         return this.subcategoriesValue
-          .filter(sc => sc.category === currentCategory)
+          .filter(sc => sc.category && sc.category.name === currentCategory)
           .map(sc => sc.name)
           .sort();
       }
@@ -165,8 +187,15 @@ export default class extends Controller {
 
   selectOption(event) {
     const option = event.currentTarget;
-    const displayValue = option.dataset.value;
+    let displayValue = option.dataset.value;
     let actualValue = displayValue;
+
+    // Handle "Create new" option
+    if (displayValue.startsWith('Criar nova: "') && displayValue.endsWith('"')) {
+      // Extract the new name from the "Create new" option
+      displayValue = displayValue.replace('Criar nova: "', '').replace('"', '');
+      actualValue = displayValue;
+    }
 
     // Handle availability mapping
     if (this.nameValue === 'available' && this.availabilityMap[displayValue]) {
@@ -186,6 +215,7 @@ export default class extends Controller {
 
     // Notify if this is a category change
     if (this.nameValue === 'category') {
+      console.log('Dispatching category:changed event with:', displayValue);
       document.dispatchEvent(new CustomEvent('category:changed', {
         detail: { category: displayValue }
       }));
@@ -260,10 +290,18 @@ export default class extends Controller {
 
     this.filteredOptions.forEach(option => {
       const optionElement = document.createElement('div');
-      optionElement.className = 'px-3 py-2 cursor-pointer hover:bg-pink-50 transition-colors';
+
+      // Style "Create new" options differently
+      if (option.startsWith('Criar nova: "')) {
+        optionElement.className = 'flex px-3 py-2 cursor-pointer hover:bg-green-50 transition-colors border-l-4 border-green-400 bg-green-25 text-green-700 font-medium';
+        optionElement.innerHTML = `<span class="material-icons text-sm mr-2">add</span>${option}`;
+      } else {
+        optionElement.className = 'px-3 py-2 cursor-pointer hover:bg-pink-50 transition-colors';
+        optionElement.textContent = option;
+      }
+
       optionElement.dataset.action = 'click->combobox#selectOption';
       optionElement.dataset.value = option;
-      optionElement.textContent = option;
       container.appendChild(optionElement);
     });
   }

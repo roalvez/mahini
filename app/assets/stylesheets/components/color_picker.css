@@ -1,0 +1,126 @@
+/* Color Picker Component Styles */
+
+.color-picker {
+  position: relative;
+}
+
+.color-picker-palette {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+}
+
+.color-picker-palette.animate-in {
+  animation-name: colorPickerFadeIn;
+}
+
+.color-picker-preview {
+  position: relative;
+  overflow: hidden;
+}
+
+.color-picker-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, #e5e7eb 25%, transparent 25%),
+              linear-gradient(-45deg, #e5e7eb 25%, transparent 25%),
+              linear-gradient(45deg, transparent 75%, #e5e7eb 75%),
+              linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+  z-index: -1;
+}
+
+.color-box {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.color-box:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.color-box:active {
+  transform: scale(0.95);
+}
+
+.color-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, #f3f4f6 25%, transparent 25%),
+              linear-gradient(-45deg, #f3f4f6 25%, transparent 25%),
+              linear-gradient(45deg, transparent 75%, #f3f4f6 75%),
+              linear-gradient(-45deg, transparent 75%, #f3f4f6 75%);
+  background-size: 4px 4px;
+  background-position: 0 0, 0 2px, 2px -2px, -2px 0px;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+@keyframes colorPickerFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Focus states */
+.color-picker-preview:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3);
+}
+
+.color-box:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.5);
+}
+
+/* Custom hex input styling */
+.hex-input {
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  text-transform: uppercase;
+}
+
+.hex-input::placeholder {
+  text-transform: none;
+  opacity: 0.5;
+}
+
+/* Gradient picker styles */
+.hue-bar {
+  position: relative;
+  user-select: none;
+}
+
+.saturation-lightness-square {
+  position: relative;
+  user-select: none;
+}
+
+.picker-handle {
+  pointer-events: none;
+  transition: transform 0.1s ease-out;
+}
+
+.picker-handle:hover {
+  transform: scale(1.1);
+}
+
+/* Prevent text selection during dragging */
+.color-picker-palette * {
+  user-select: none;
+}

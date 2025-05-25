@@ -2,6 +2,17 @@ import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
   static targets = ["row", "loading"];
+  static values = { baseUrl: String };
+
+  // Handle row clicks to navigate to product
+  rowClick(event) {
+    const row = event.currentTarget;
+    const productId = row.dataset.productId;
+
+    if (productId && this.baseUrlValue) {
+      window.location.href = `${this.baseUrlValue}/${productId}`;
+    }
+  }
 
   showLoading() {
     if (this.hasLoadingTarget) {

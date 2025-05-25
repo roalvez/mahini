@@ -11,4 +11,8 @@ class Product < ApplicationRecord
   has_many :sizes, through: :product_variants
 
   validates :name, :price_cents, presence: true
+
+  accepts_nested_attributes_for :product_variants,
+                                allow_destroy: true,
+                                reject_if: :all_blank
 end

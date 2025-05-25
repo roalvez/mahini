@@ -1,0 +1,179 @@
+<div class="border border-pink-100 rounded-lg p-4 bg-pink-50" data-variant-index="<%= variant_index %>">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="font-medium text-pink-700">Nova Variação</h3>
+    <button type="button"
+            data-action="click->product-variants#removeVariant"
+            class="cursor-pointer text-red-600 hover:text-red-700 transition-colors">
+      <span class="material-icons">delete</span>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Color Selection -->
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-pink-700 mb-2">Cor</label>
+
+      <!-- Color Selection Mode Toggle -->
+      <div class="mb-3">
+        <div class="flex gap-4">
+          <label class="flex items-center">
+            <input type="radio"
+                   name="color_mode_<%= variant_index %>"
+                   value="existing"
+                   checked
+                   class="h-4 w-4 text-pink-600 focus:ring-pink-300 border-pink-300">
+            <span class="ml-2 text-sm text-gray-700">Escolher cor existente</span>
+          </label>
+          <label class="flex items-center">
+            <input type="radio"
+                   name="color_mode_<%= variant_index %>"
+                   value="new"
+                   class="h-4 w-4 text-pink-600 focus:ring-pink-300 border-pink-300">
+            <span class="ml-2 text-sm text-gray-700">Criar nova cor</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Existing Color Selection -->
+      <div class="existing-color-section mb-4">
+        <div data-controller="color-combobox"
+             data-color-combobox-colors-value="<%= (@form_data[:colors] || []).to_json %>"
+             class="relative">
+          <div class="relative">
+            <input type="text"
+                   data-color-combobox-target="input"
+                   data-action="input->color-combobox#onInput focus->color-combobox#onFocus"
+                   placeholder="Digite ou selecione uma cor..."
+                   class="w-full px-3 py-2 pr-10 border border-pink-200 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition-all duration-200">
+
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <button type="button"
+                      data-color-combobox-target="clearButton"
+                      data-action="click->color-combobox#clearFilter"
+                      class="hidden text-gray-400 hover:text-gray-600">
+                <span class="material-icons text-sm">close</span>
+              </button>
+              <button type="button"
+                      data-action="click->color-combobox#toggleDropdown"
+                      class="text-gray-400 hover:text-gray-600 ml-1">
+                <span class="material-icons text-sm transition-transform duration-200" data-color-combobox-target="arrow">expand_more</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dropdown -->
+          <div data-color-combobox-target="dropdown"
+               class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+            <div data-color-combobox-target="options">
+              <!-- Options will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Hidden select for form submission -->
+          <select name="product[product_variants_attributes][<%= variant_index %>][color_id]"
+                  data-color-combobox-target="hiddenSelect"
+                  class="hidden">
+            <option value="">Selecione uma cor...</option>
+            <!-- Options will be populated by JavaScript -->
+          </select>
+        </div>
+      </div>
+
+      <!-- New Color Creation -->
+      <div class="new-color-section hidden space-y-4">
+        <!-- Color Name Input -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Cor</label>
+          <input type="text"
+                 name="product[product_variants_attributes][<%= variant_index %>][new_color_name]"
+                 placeholder="Ex: Azul Marinho"
+                 class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+        </div>
+
+        <!-- Color Picker -->
+        <div data-controller="simple-color-picker"
+             data-simple-color-picker-variant-index-value="<%= variant_index %>">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Cor</label>
+          <div class="flex items-center gap-3">
+            <input type="color"
+                   data-simple-color-picker-target="colorInput"
+                   data-action="input->simple-color-picker#updateColor"
+                   name="product[product_variants_attributes][<%= variant_index %>][new_color_hex]"
+                   value="#ffffff"
+                   class="w-12 h-8 border border-gray-300 rounded cursor-pointer">
+            <input type="text"
+                   data-simple-color-picker-target="displayInput"
+                   value="#ffffff"
+                   placeholder="#ffffff"
+                   maxlength="7"
+                   readonly
+                   class="flex-1 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm font-mono">
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden inputs for form submission -->
+      <input type="hidden"
+             name="product[product_variants_attributes][<%= variant_index %>][color_name]"
+             data-variant-color-name="<%= variant_index %>">
+      <input type="hidden"
+             name="product[product_variants_attributes][<%= variant_index %>][color_hex]"
+             data-variant-color-hex="<%= variant_index %>">
+    </div>
+
+    <!-- Available Sizes -->
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-pink-700 mb-2">Tamanhos Disponíveis</label>
+      <div class="grid grid-cols-4 md:grid-cols-7 gap-2" data-product-variants-target="sizesContainer">
+        <!-- Sizes will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Variant Available -->
+    <div class="flex items-center">
+      <input type="checkbox"
+             name="product[product_variants_attributes][<%= variant_index %>][available]"
+             value="1"
+             checked
+             class="h-4 w-4 text-pink-600 focus:ring-pink-300 border-pink-300 rounded">
+      <label class="ml-2 text-sm font-medium text-pink-700">Variação disponível</label>
+    </div>
+
+    <!-- Images Upload -->
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-pink-700 mb-2">Imagens da Variação</label>
+      <div data-controller="image-upload"
+           data-image-upload-max-files-value="5"
+           class="border-2 border-dashed border-pink-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
+
+        <input type="file"
+               name="product[product_variants_attributes][<%= variant_index %>][images][]"
+               multiple
+               accept="image/*"
+               data-image-upload-target="input"
+               data-action="change->image-upload#handleFiles"
+               class="hidden">
+
+        <div data-image-upload-target="dropzone"
+             data-action="click->image-upload#triggerFileInput dragover->image-upload#handleDragOver drop->image-upload#handleDrop"
+             class="cursor-pointer">
+          <span class="material-icons text-4xl text-pink-400 mb-2">cloud_upload</span>
+          <p class="text-pink-600 font-medium">Clique para selecionar ou arraste imagens aqui</p>
+          <p class="text-sm text-gray-500 mt-1">Máximo 5 imagens por variação</p>
+        </div>
+
+        <!-- Image Previews -->
+        <div data-image-upload-target="previews" class="hidden mt-4">
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <!-- Image previews will be added here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden destroy field -->
+    <input type="hidden"
+           name="product[product_variants_attributes][<%= variant_index %>][_destroy]"
+           value="0">
+  </div>
+</div>

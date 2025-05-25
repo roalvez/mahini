@@ -1,6 +1,19 @@
 <div class="overflow-x-auto" id="admin-products-index">
   <%= turbo_frame_tag "products_table" do %>
-    <div data-controller="products-table" data-action="combobox:filter->products-table#filter">
+    <div data-controller="products-table"
+         data-action="combobox:filter->products-table#filter"
+         data-products-table-base-url-value="<%= admin_products_path %>">
+
+      <!-- Header with New Product Button -->
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-pink-700">Gerenciar Produtos</h1>
+        <%= link_to new_admin_product_path,
+            data: { turbo_frame: "_top" },
+            class: "bg-pink-600 hover:bg-pink-700 text-white font-medium px-6 py-3 rounded-md transition-colors duration-200 flex items-center gap-2" do %>
+          <span class="material-icons">add</span>
+          Novo Produto
+        <% end %>
+      </div>
 
       <!-- Filters Section -->
       <div class="bg-white border border-pink-200 rounded-lg shadow-lg mb-6 p-6">
@@ -228,7 +241,11 @@
             </td>
           </tr>
           <% @products.each do |product| %>
-            <tr id="products-table-content-row" data-products-table-target="row" class="border-b border-pink-100 hover:bg-pink-50 transition-colors">
+            <tr id="products-table-content-row"
+                data-products-table-target="row"
+                data-product-id="<%= product.id %>"
+                data-action="click->products-table#rowClick"
+                class="border-b border-pink-100 hover:bg-pink-50 transition-colors cursor-pointer">
               <td class="py-2 px-4">
                 <% first_variant = product.product_variants.includes(images_attachments: :blob).find { |v| v.images.attached? } %>
                 <% if first_variant %>

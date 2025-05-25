@@ -1,0 +1,116 @@
+<div class="border border-pink-100 rounded-lg p-4 bg-pink-50" data-variant-index="<%= variant_index %>">
+  <div class="flex justify-between items-center mb-4">
+    <button type="button"
+            data-action="click->product-variants#removeVariant"
+            class="cursor-pointer text-red-600 hover:text-red-700 transition-colors">
+      <span class="material-icons">delete</span>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Color Display -->
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-pink-700 mb-2">Cor</label>
+      <div class="flex items-center gap-3 p-3 bg-white border border-pink-200 rounded-md">
+        <div class="w-8 h-8 rounded border-2 border-pink-300"
+             style="background-color: <%= color.hex || '#cccccc' %>"></div>
+        <span class="font-medium text-pink-700"><%= color.name %></span>
+
+        <!-- Hidden fields for color -->
+        <input type="hidden" name="product[product_variants_attributes][<%= variant_index %>][color_id]" value="<%= color.id %>">
+      </div>
+    </div>
+
+    <!-- Available Sizes -->
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-pink-700 mb-2">Tamanhos Disponíveis</label>
+      <div class="grid grid-cols-4 md:grid-cols-7 gap-2">
+        <% form_data[:sizes].each do |size| %>
+          <% variant_for_size = variants.find { |v| v.size_id == size.id } %>
+          <label class="flex items-center justify-center p-2 border border-pink-200 rounded-md cursor-pointer hover:bg-pink-50 transition-colors <%= 'bg-pink-100 border-pink-400 text-pink-800' if variant_for_size %>">
+            <input type="checkbox"
+                   name="product[product_variants_attributes][<%= variant_index %>][size_ids][]"
+                   value="<%= size.id %>"
+                   <%= 'checked' if variant_for_size %>
+                   class="sr-only">
+            <span class="text-sm font-medium"><%= size.name %></span>
+
+            <!-- Hidden field for existing variant ID if it exists -->
+            <% if variant_for_size %>
+              <input type="hidden" name="product[product_variants_attributes][<%= variant_index %>][variants][<%= size.id %>][id]" value="<%= variant_for_size.id %>">
+            <% end %>
+          </label>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Variant Available -->
+    <div class="flex items-center">
+      <input type="checkbox"
+             name="product[product_variants_attributes][<%= variant_index %>][available]"
+             value="1"
+             <%= 'checked' if variants.any?(&:available) %>
+             class="h-4 w-4 text-pink-600 focus:ring-pink-300 border-pink-300 rounded">
+      <label class="ml-2 text-sm font-medium text-pink-700">Variação disponível</label>
+    </div>
+
+    <!-- Images Display and Upload -->
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-pink-700 mb-2">Imagens da Variação</label>
+
+      <!-- Existing Images -->
+      <% existing_images = variants.flat_map { |v| v.images.attached? ? v.images : [] } %>
+      <% if existing_images.any? %>
+        <div class="mb-4">
+          <h4 class="text-sm font-medium text-gray-700 mb-2">Imagens Atuais:</h4>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <% existing_images.each_with_index do |image, img_index| %>
+              <div class="relative group">
+                <%= image_tag url_for(image.variant(resize_to_limit: [100, 100]).processed),
+                              class: "w-full h-20 object-cover rounded border-2 border-pink-200" %>
+                <button type="button"
+                        data-action="click->product-variants#removeExistingImage"
+                        data-image-id="<%= image.id %>"
+                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                  ×
+                </button>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- New Images Upload -->
+      <div data-controller="image-upload"
+           data-image-upload-max-files-value="5"
+           class="border-2 border-dashed border-pink-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
+
+        <input type="file"
+               name="product[product_variants_attributes][<%= variant_index %>][images][]"
+               multiple
+               accept="image/*"
+               data-image-upload-target="input"
+               data-action="change->image-upload#handleFiles"
+               class="hidden">
+
+        <div data-image-upload-target="dropzone"
+             data-action="click->image-upload#triggerFileInput dragover->image-upload#handleDragOver drop->image-upload#handleDrop"
+             class="cursor-pointer">
+          <span class="material-icons text-4xl text-pink-400 mb-2">cloud_upload</span>
+          <p class="text-pink-600 font-medium">Adicionar novas imagens</p>
+          <p class="text-sm text-gray-500 mt-1">Clique para selecionar ou arraste imagens aqui</p>
+        </div>
+
+        <!-- New Image Previews -->
+        <div data-image-upload-target="previews" class="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4 hidden">
+          <!-- Image previews will be added here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden destroy field -->
+    <input type="hidden"
+           name="product[product_variants_attributes][<%= variant_index %>][_destroy]"
+           value="0">
+  </div>
+</div>
